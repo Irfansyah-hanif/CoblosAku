@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Tambahan agar font default lebih enak dilihat di HP */
+body {
+  background-color: #f8fafc; /* Slate-50 */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Utilitas untuk padding aman di iPhone (Notch) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
