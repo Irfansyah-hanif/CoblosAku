@@ -17,12 +17,12 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'pwa-192x192.png', // Pastikan Anda nanti membuat/menyimpan file gambar ini di folder public
+            src: 'coblosaku.png', 
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png', // Pastikan Anda nanti membuat/menyimpan file gambar ini di folder public
+            src: 'coblosaku.png', 
             sizes: '512x512',
             type: 'image/png'
           }

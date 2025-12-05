@@ -1,5 +1,5 @@
 import React from 'react';
-import { Vote, LogOut, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 
 const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => {
   const navItems = [
@@ -9,25 +9,28 @@ const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => 
     { id: 'news', label: 'Berita' },
   ];
 
-  // Tentukan apakah user sudah login (bukan mode tamu/null)
   const isUserLoggedIn = role === 'voter' || role === 'admin';
 
   return (
-    // 'hidden md:block' artinya sembunyi di HP, muncul di layar medium/besar
     <nav className="hidden md:block fixed top-0 left-0 right-0 bg-slate-900 border-b border-slate-800 z-50 shadow-xl">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           
-          {/* LOGO */}
+          {/* LOGO & BRAND TEXT (Updated Style) */}
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => setActiveTab('home')}
           >
-            <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 group-hover:border-amber-500 transition-colors">
-              <Vote className="text-amber-500 w-6 h-6" />
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              COBLOS <span className="text-amber-500 italic">AKU</span>
+            <img 
+              src="/coblosaku.png" 
+              alt="Coblos Aku" 
+              className="h-10 w-auto object-contain" 
+            />
+            
+            {/* Style disamakan dengan referensi: Font Bold White + Amber Italic Serif */}
+            {/* Ukuran disesuaikan menjadi text-2xl agar pas di navbar */}
+            <h1 className="text-2xl font-bold text-white tracking-tight group-hover:opacity-90 transition-opacity">
+              COBLOS <span className="text-amber-500 italic font-serif">AKU</span>
             </h1>
           </div>
 
@@ -44,7 +47,6 @@ const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => 
                 }`}
               >
                 {item.label}
-                {/* Garis bawah aktif */}
                 {activeTab === item.id && (
                   <span className="absolute -bottom-8 left-0 right-0 h-1 bg-amber-500 rounded-t-full"></span>
                 )}
@@ -53,7 +55,6 @@ const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => 
           </div>
 
           {/* USER PROFILE & LOGOUT */}
-          {/* Tampilkan hanya jika user sudah login (role bukan null/tamu) */}
           {isUserLoggedIn ? (
             <div className="flex items-center gap-4">
               <div 
@@ -73,7 +74,6 @@ const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => 
 
               <button 
                 onClick={onLogout}
-                // --- PERUBAHAN DI SINI: Ikon LogOut (User Login)
                 className="p-2.5 text-red-500 hover:text-white hover:bg-red-500 rounded-full transition-all"
                 title="Keluar Aplikasi"
               >
@@ -81,10 +81,8 @@ const HeaderNavigation = ({ activeTab, setActiveTab, role, user, onLogout }) => 
               </button>
             </div>
           ) : (
-            // Jika mode tamu, tampilkan tombol Keluar/Pilih Peran
              <button
                 onClick={onLogout} 
-                // --- PERUBAHAN DI SINI: Tombol Keluar (Pilih Peran)
                 className="flex items-center gap-2 text-white bg-red-600 px-3 py-1.5 rounded-lg border border-red-500/50 hover:bg-red-700 transition text-sm font-medium"
              >
                 <LogOut size={16} /> Keluar (Pilih Peran)
