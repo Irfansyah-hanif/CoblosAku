@@ -1,25 +1,39 @@
 import React from 'react';
+import { RefreshCw } from 'lucide-react'; // Import ikon Reset
 
-const VotingPage = ({ candidates }) => {
+const VotingPage = ({ candidates, role, onResetElection }) => {
   
   // 1. HITUNG TOTAL SUARA (Dilakukan sekali di luar loop)
-  // Menggunakan Number() untuk memastikan data dari database terbaca sebagai angka
   const totalVotes = candidates.reduce((total, candidate) => {
     const count = Number(candidate.vote_count) || 0; 
     return total + count;
   }, 0);
 
-  // 2. Sortir kandidat berdasarkan nomor urut (Salin array dulu agar aman)
+  // 2. Sortir kandidat berdasarkan nomor urut
   const sortedCandidates = [...candidates].sort((a, b) => a.number - b.number);
 
   return (
     <div className="p-6 animate-fade-in pb-24 md:pb-10">
-       <div className="mb-6 border-l-4 border-amber-500 pl-3">
-         <h2 className="text-2xl font-bold text-slate-900 font-serif">Live Count</h2>
-         <p className="text-slate-500 text-xs mt-1">
-            Hasil perolehan suara sementara. 
-            <span className="ml-2 font-bold text-amber-600">Total: {totalVotes} Suara</span>
-         </p>
+       {/* Container Header: Flexbox untuk memisahkan Judul dan Tombol */}
+       <div className="flex justify-between items-start mb-6">
+           <div className="border-l-4 border-amber-500 pl-3">
+             <h2 className="text-2xl font-bold text-slate-900 font-serif">Live Count</h2>
+             <p className="text-slate-500 text-xs mt-1">
+                Hasil perolehan suara sementara. 
+                <span className="ml-2 font-bold text-amber-600">Total: {totalVotes} Suara</span>
+             </p>
+           </div>
+
+           {/* TOMBOL RESET (Hanya Tampil untuk Admin) */}
+           {role === 'admin' && (
+               <button 
+                 onClick={onResetElection}
+                 className="bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-red-600 hover:text-white transition shadow-sm"
+                 title="Hapus semua suara dan mulai ulang pemilihan"
+               >
+                 <RefreshCw size={14} /> Reset Data
+               </button>
+           )}
        </div>
        
        <div className="space-y-4">

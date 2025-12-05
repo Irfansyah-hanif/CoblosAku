@@ -6,7 +6,7 @@ import useAppController from "./hooks/useAppController";
 // Layout Components
 import HeaderNavigation from "./components/HeaderNavigation";
 import BottomNavigation from "./components/BottomNavigation";
-import GlobalModal from "./components/GlobalModal"; // <-- IMPORT BARU
+import GlobalModal from "./components/GlobalModal"; 
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -55,13 +55,16 @@ export default function App() {
     handleEditNews, 
     handleDeleteNews,
     
-    // MODAL STATE BARU DARI HOOK
-    modalState, // <-- AMBIL STATE MODAL
-    closeModal, // <-- AMBIL HANDLER MODAL
+    // MODAL STATE DARI HOOK
+    modalState, 
+    closeModal, 
     
-    // Tambahkan prop yang diperlukan oleh HomePage
+    // Props untuk HomePage
     electionEndDate,
-    handleSetEndDate
+    handleSetEndDate,
+
+    // FITUR RESET (BARU)
+    handleResetElection 
   } = useAppController();
 
   // --- LOGIKA DETAIL KANDIDAT ---
@@ -79,7 +82,6 @@ export default function App() {
   // --- LOGIKA DETAIL BERITA ---
 
   const handleViewNewsDetail = (newsItem) => {
-    // Saat item berita diklik, set state selectedNews
     setSelectedNews(newsItem);
   };
 
@@ -87,13 +89,13 @@ export default function App() {
     setSelectedNews(null);
   };
 
-  // Tentukan apakah kita berada di halaman detail (Kandidat atau Berita)
+  // Tentukan apakah kita berada di halaman detail
   const isViewingDetailPage = !!selectedNews || !!selectedCandidateId;
 
-  // Render Utama dibagi menjadi dua: Modal dan Konten Aplikasi
+  // Render Utama
   return (
     <>
-      {/* 1. GLOBAL MODAL (Diletakkan di level tertinggi agar selalu terlihat) */}
+      {/* 1. GLOBAL MODAL */}
       <GlobalModal 
           isOpen={modalState.isOpen}
           type={modalState.type}
@@ -106,17 +108,17 @@ export default function App() {
       
       {/* 2. KONTEN APLIKASI */}
       {!role ? (
-        // TAMPILAN 1: Halaman Login (Jika role == null)
+        // TAMPILAN 1: Halaman Login
         <LoginPage 
           onLogin={handleLogin} 
           onRegister={handleRegister} 
           onGuestLogin={handleGuestLogin}
         />
       ) : (
-        // TAMPILAN 2: Aplikasi Utama (Jika role sudah terisi)
+        // TAMPILAN 2: Aplikasi Utama
         <div className="min-h-screen bg-slate-50 font-sans">
           
-          {/* Header (Sembunyikan jika di halaman detail manapun) */}
+          {/* Header */}
           {!isViewingDetailPage && ( 
             <HeaderNavigation
               activeTab={activeTab}
@@ -130,7 +132,7 @@ export default function App() {
           {/* Main Content */}
           <main className="md:pt-20 pb-safe md:pb-10 w-full md:max-w-7xl md:mx-auto p-4 md:p-6">
 
-            {/* Tampilkan detail kandidat jika selectedCandidateId ada */}
+            {/* Detail Kandidat */}
             {selectedCandidateId && (
                 <CandidateDetailPage 
                   candidate={currentCandidate} 
@@ -142,7 +144,7 @@ export default function App() {
                 />
             )}
             
-            {/* Tampilkan detail berita jika selectedNews ada */}
+            {/* Detail Berita */}
             {!selectedCandidateId && selectedNews && ( 
                 <NewsDetailPage 
                   newsItem={selectedNews} 
@@ -153,25 +155,22 @@ export default function App() {
                 />
             )}
             
-            {/* Tampilkan Tab Utama jika tidak ada detail yang sedang dilihat */}
+            {/* Tab Utama */}
             {!isViewingDetailPage && ( 
               <>
                 {activeTab === "home" && (
-                  // Komponen HomePage
                   <HomePage
                     role={role}
                     userVoteStatus={userVoteStatus}
                     setActiveTab={setActiveTab}
                     news={news}
                     onViewNewsDetail={handleViewNewsDetail}
-                    // Tambahkan props terkait waktu untuk Admin
                     electionEndDate={electionEndDate}
                     handleSetEndDate={handleSetEndDate}
                   />
                 )}
 
                 {activeTab === "candidates" && (
-                  // Komponen CandidatesPage
                   <CandidatesPage
                     candidates={candidates}
                     role={role}
@@ -186,12 +185,15 @@ export default function App() {
                 )}
 
                 {activeTab === "voting" && (
-                  // Komponen VotingPage
-                  <VotingPage candidates={candidates} />
+                  <VotingPage 
+                    candidates={candidates} 
+                    // PERBAIKAN: Mengirim props role dan fungsi reset ke VotingPage
+                    role={role}
+                    onResetElection={handleResetElection}
+                  />
                 )}
 
                 {activeTab === "news" && (
-                  // Komponen NewsPage
                   <NewsPage 
                     news={news} 
                     role={role} 
@@ -203,7 +205,6 @@ export default function App() {
                 )}
 
                 {activeTab === "profile" && (
-                  // Komponen ProfilePage
                   <ProfilePage
                     user={user}
                     role={role}
@@ -214,7 +215,7 @@ export default function App() {
             )}
           </main>
 
-          {/* Bottom Navigation (Sembunyikan jika di halaman detail manapun) */}
+          {/* Bottom Navigation */}
           {!isViewingDetailPage && ( 
             <BottomNavigation 
               activeTab={activeTab} 

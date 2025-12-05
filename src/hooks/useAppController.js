@@ -312,17 +312,24 @@ export default function useAppController() {
         
         try {
           let photo_url = null;
+          // Upload ke Storage jika ada file
           if (candidateData.photoFile && api) {
               photo_url = await api.uploadCandidatePhoto(candidateData.photoFile, candidateData.name); 
           }
+          // Default avatar jika tidak ada
           if (!photo_url) {
             photo_url = `https://ui-avatars.com/api/?name=${candidateData.name}&background=random`;
           }
 
           if (!api) throw new Error("API service not initialized.");
 
+          // --- PERBAIKAN: Pisahkan 'photoFile' agar tidak ikut terkirim ke Database ---
+          // eslint-disable-next-line no-unused-vars
+          const { photoFile, ...dataForDatabase } = candidateData;
+
+          // Simpan data bersih ke Database
           await api.addCandidate({
-            ...candidateData,
+            ...dataForDatabase,
             photo_url: photo_url, 
             number: parseInt(candidateData.number),
             vote_count: 0,
@@ -479,6 +486,37 @@ export default function useAppController() {
             () => performDeleteNews(id)
         );
     };
+
+    // --- LOGIKA RESET PEMILIHAN (ADMIN) ---
+    const handleResetElection = () => {
+        if (role !== 'admin') {
+            showAlert("Akses ditolak.", 'error', 'Akses Ditolak');
+            return;
+        }
+
+        showConfirm(
+            "Reset Hasil Pemilihan",
+            "PERINGATAN KERAS:\n\nTindakan ini akan MENGHAPUS SEMUA SUARA yang telah masuk dan mengembalikan skor semua kandidat menjadi 0.\n\nData yang dihapus tidak dapat dikembalikan. Apakah Anda yakin ingin memulai ulang pemilihan?",
+            async () => {
+                try {
+                    if (!api) throw new Error("API service not initialized.");
+                    
+                    await api.resetElection();
+                    
+                    // Reset status voting admin (jika admin ikut nyoblos sebelumnya)
+                    setUserVoteStatus({ hasVoted: false });
+                    
+                    // Refresh data tampilan
+                    await fetchCandidatesAndNews();
+                    
+                    showAlert("Pemilihan berhasil di-reset. Semua suara telah dihapus.", 'success', 'Reset Berhasil');
+                } catch (err) {
+                    console.error("Reset Election Error:", err);
+                    showAlert(`Gagal mereset pemilihan: ${err.message}`, 'error', 'Error');
+                }
+            }
+        );
+    };
     
     // Hapus logika onSnapshot jika ada, karena kita sudah menggunakan fetchCandidatesAndNews()
 
@@ -512,6 +550,7 @@ export default function useAppController() {
     handleEditNews, 
     handleDeleteNews, 
     handleSetEndDate,
+    handleResetElection, // <-- Ekspor fungsi reset election
     
     // EXPOSURE MODAL
     modalState,

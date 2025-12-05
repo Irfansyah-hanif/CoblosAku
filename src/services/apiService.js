@@ -28,7 +28,6 @@ export class ApiService {
 
     try {
       // 2. Upload file ke Supabase Storage
-      // PENTING: Nama bucket ditulis langsung 'candidate_photos' (huruf kecil)
       const { data, error: uploadError } = await supabase.storage
         .from('candidate_photos') 
         .upload(filePath, file, {
@@ -203,6 +202,39 @@ export class ApiService {
         }
     }
     
+    return true;
+  }
+
+  // --- ADMIN FEATURES (RESET) ---
+  
+  async resetElection() {
+    console.log("API: Memulai reset pemilihan...");
+    
+    // 1. Hapus semua riwayat suara di tabel 'votes'
+    // PERBAIKAN: Menggunakan .not('id', 'is', null) agar kompatibel dengan UUID
+    const { error: deleteError } = await supabase
+      .from('votes')
+      .delete()
+      .not('id', 'is', null); 
+
+    if (deleteError) {
+      console.error("Error clearing votes table:", deleteError);
+      throw new Error("Gagal mengosongkan tabel suara.");
+    }
+
+    // 2. Reset hitungan suara (vote_count) di tabel 'candidates' menjadi 0
+    // PERBAIKAN: Menggunakan .not('id', 'is', null) agar kompatibel dengan UUID
+    const { error: updateError } = await supabase
+      .from('candidates')
+      .update({ vote_count: 0 })
+      .not('id', 'is', null); // Terapkan pada semua kandidat
+
+    if (updateError) {
+      console.error("Error resetting candidate counts:", updateError);
+      throw new Error("Gagal mereset skor kandidat.");
+    }
+
+    console.log("API: Reset pemilihan berhasil.");
     return true;
   }
 
